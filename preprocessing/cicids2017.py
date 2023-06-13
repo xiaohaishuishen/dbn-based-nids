@@ -24,7 +24,7 @@ class CICIDS2017Preprocessor(object):
     def read_data(self):
         """"""
         filenames = glob.glob(os.path.join(self.data_path, 'raw', '*.csv'))
-        datasets = [pd.read_csv(filename) for filename in filenames]
+        datasets = [pd.read_csv(filename, encoding='utf-8') for filename in filenames]
 
         # Remove white spaces and rename the columns
         for dataset in datasets:
@@ -102,8 +102,14 @@ class CICIDS2017Preprocessor(object):
             'SSH-Patator': 'Brute Force',
             'Bot': 'Botnet ARES',
             'Web Attack � Brute Force': 'Web Attack',
+            # 'Web Attack Â\x96 Brute Force': 'Web Attack',
+
             'Web Attack � Sql Injection': 'Web Attack',
+            # 'Web Attack Â\x96 Sql Injection': 'Web Attack',
+
             'Web Attack � XSS': 'Web Attack',
+            # 'Web Attack Â\x96 XSS': 'Web Attack',
+
             'Infiltration': 'Infiltration'
         }
 
@@ -134,7 +140,7 @@ class CICIDS2017Preprocessor(object):
     def scale(self, training_set, validation_set, testing_set):
         """"""
         (X_train, y_train), (X_val, y_val), (X_test, y_test) = training_set, validation_set, testing_set
-        
+
         categorical_features = self.features.select_dtypes(exclude=["number"]).columns
         numeric_features = self.features.select_dtypes(exclude=[object]).columns
 
@@ -158,6 +164,59 @@ class CICIDS2017Preprocessor(object):
         y_test = pd.DataFrame(le.transform(y_test), columns=["label"])
 
         return (X_train, y_train), (X_val, y_val), (X_test, y_test)
+
+    # def scale(self, training_set, validation_set, testing_set):
+    #     (X_train, y_train), (X_val, y_val), (X_test, y_test) = training_set, validation_set, testing_set
+    #
+    #     categorical_features = self.features.select_dtypes(exclude=["number"]).columns
+    #     numeric_features = self.features.select_dtypes(exclude=[object]).columns
+    #
+    #     preprocessor = ColumnTransformer(transformers=[
+    #         ('categoricals', OneHotEncoder(drop='first', sparse=False, handle_unknown='error'), categorical_features),
+    #         ('numericals', QuantileTransformer(), numeric_features)
+    #     ])
+    #
+    #     # Preprocess the features
+    #     columns = numeric_features.tolist()
+    #
+    #     # Scale the features in batches
+    #     batch_size = 1000
+    #     n_batches = int(np.ceil(len(X_train) / batch_size))
+    #
+    #     X_train_scaled = []
+    #     X_val_scaled = []
+    #     X_test_scaled = []
+    #
+    #     for i in range(n_batches):
+    #         start_idx = i * batch_size
+    #         end_idx = (i + 1) * batch_size
+    #
+    #         X_train_batch = X_train[start_idx:end_idx]
+    #         X_val_batch = X_val[start_idx:end_idx]
+    #         X_test_batch = X_test[start_idx:end_idx]
+    #
+    #         # 重置索引以匹配数据的形状
+    #         X_train_batch = X_train_batch.reset_index(drop=True)
+    #         X_val_batch = X_val_batch.reset_index(drop=True)
+    #         X_test_batch = X_test_batch.reset_index(drop=True)
+    #
+    #         # 将数据拼接到结果列表中
+    #         X_train_scaled.append(X_train_batch)
+    #         X_val_scaled.append(X_val_batch)
+    #         X_test_scaled.append(X_test_batch)
+    #
+    #     X_train = pd.concat(X_train_scaled)
+    #     X_val = pd.concat(X_val_scaled)
+    #     X_test = pd.concat(X_test_scaled)
+    #
+    #     # Preprocess the labels
+    #     le = LabelEncoder()
+    #
+    #     y_train = pd.DataFrame(le.fit_transform(y_train), columns=["label"])
+    #     y_val = pd.DataFrame(le.transform(y_val), columns=["label"])
+    #     y_test = pd.DataFrame(le.transform(y_test), columns=["label"])
+    #
+    #     return (X_train, y_train), (X_val, y_val), (X_test, y_test)
 
 
 if __name__ == "__main__":

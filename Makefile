@@ -1,4 +1,4 @@
-VENV=venv
+VENV=dbn
 BIN=$(VENV)/bin
 
 # make it work on windows too

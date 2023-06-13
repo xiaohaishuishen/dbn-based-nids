@@ -1,6 +1,6 @@
 from tqdm import tqdm
 import logging
-
+import numpy as np
 import torch
 import torch.nn as nn
 
@@ -13,7 +13,7 @@ class DBN(nn.Module):
     def __init__(self,
                  n_visible=49,
                  n_hidden=(128, 128, 64),
-                 n_classes=6,
+                 n_classes=7,
                  learning_rate=(0.1, 0.1, 0.1),
                  momentum=(0.9, 0.9, 0.9),
                  decay=(0, 0, 0),
@@ -177,7 +177,7 @@ class DBN(nn.Module):
 
         # Initializing the dataset's variables
         input_data_loader = train_loader
-        input_data = torch.tensor(train_loader.dataset.features.values)
+        input_data = torch.tensor(train_loader.dataset.features.values.astype(np.float64))
 
         # For every possible model (RBM)
         for i, model in enumerate(self.models):

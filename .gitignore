@@ -148,3 +148,5 @@ cython_debug/
 /checkpoints
 /images
 /logs
+data/
+notebooks/data/
